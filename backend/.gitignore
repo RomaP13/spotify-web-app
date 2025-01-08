@@ -1,8 +1,8 @@
-# Virtual environment
-venv
-
-# Python
 __pycache__
-
-# Environment
-.env
+app.egg-info
+*.pyc
+.mypy_cache
+.coverage
+htmlcov
+.cache
+.venv
