@@ -1,24 +1,17 @@
 import base64
-from functools import lru_cache
-from typing import Annotated
 from urllib.parse import urlencode
 
 import requests
-from fastapi import Depends, FastAPI, Request
+from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 
-from app.config import Settings
+from app.core.config import settings
 
 app = FastAPI()
 
 
-@lru_cache
-def get_settings() -> Settings:
-    return Settings()  # pyright: ignore
-
-
 @app.get("/")
-def read_root(settings: Annotated[Settings, Depends(get_settings)]):
+def read_root():
     return {
         "Hello": "World",
         "REDIRECT_URI": settings.redirect_uri,
@@ -28,9 +21,7 @@ def read_root(settings: Annotated[Settings, Depends(get_settings)]):
 
 
 @app.get("/login")
-def login(
-    settings: Annotated[Settings, Depends(get_settings)]
-) -> RedirectResponse:
+def login() -> RedirectResponse:
     spotify_auth_url = "https://accounts.spotify.com/authorize"
     scope = "user-library-read user-read-private user-read-email"
     params: dict[str, str] = {
@@ -49,9 +40,7 @@ def login(
 
 
 @app.get("/callback")
-def callback(
-    settings: Annotated[Settings, Depends(get_settings)], request: Request
-):
+def callback(request: Request):
     print("Callback function triggered")
     code = request.query_params.get("code")
     # state = request.query_params.get("state")
