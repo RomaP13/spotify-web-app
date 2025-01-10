@@ -5,7 +5,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
 
 from app.api.dependencies import SessionDep
-from app.api.utils.spotify.user import update_or_create_user_tokens
+from app.api.spotify.user import update_or_create_user_tokens
 from app.core.config import settings
 from app.models import SpotifyTokenData
 
