@@ -15,6 +15,10 @@ router = APIRouter()
 @router.get("/callback")
 def callback(request: Request, session: SessionDep):
     code = request.query_params.get("code")
+    # state = request.query_params.get("state")
+
+    # TODO: Compare the state parameter with the state parameter
+    #       it originally provided from login function
 
     token_url = "https://accounts.spotify.com/api/token"
     request_string = (
@@ -25,6 +29,7 @@ def callback(request: Request, session: SessionDep):
     encoded_bytes = base64.b64encode(request_string.encode("utf-8"))
     encoded_string = str(encoded_bytes, "utf-8")
     headers = {
+        # Format: Authorization: Basic <base64 encoded client_id:client_secret>
         "Authorization": "Basic " + encoded_string,
         "Content-Type": "application/x-www-form-urlencoded",
     }
