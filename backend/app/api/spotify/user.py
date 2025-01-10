@@ -1,0 +1,43 @@
+from datetime import datetime, timedelta
+
+import requests
+
+from app.api.dependencies import SessionDep
+from app.models import SpotifyToken, SpotifyTokenData
+
+
+def get_user_tokens(
+    session: SessionDep, spotify_user_id: str
+) -> SpotifyToken | None:
+    user_tokens = session.get(SpotifyToken, spotify_user_id)
+    if user_tokens:
+        return user_tokens
+    return None
+
+
+def update_or_create_user_tokens(
+    session: SessionDep, token_data: SpotifyTokenData
+):
+    access_token = token_data.access_token
+    refresh_token = token_data.refresh_token
+    expires_in = datetime.utcnow() + timedelta(seconds=token_data.expires_in)
+
+    user_id = get_user_id(access_token)
+    tokens = get_user_tokens(session, user_id)
+    if tokens:
+        tokens.sqlmodel_update(token_data)
+    else:
+        tokens = SpotifyToken(
+            user_id=user_id,
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_in=expires_in,
+        )
+    session.add(tokens)
+    session.commit()
+
+
+def get_user_id(access_token: str) -> str:
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.get("https://api.spotify.com/v1/me", headers=headers)
+    return response.json().get("id")
