@@ -9,7 +9,14 @@ from app.core.config import settings
 from app.models import SpotifyTokenData
 
 
-def get_auth_headers():
+def get_basic_auth_headers() -> dict[str, str]:
+    """
+    Create basic authentication headers using Spotify client credentials.
+
+    Returns:
+        dict[str, str]: A dictionary containing the 'Authorization'
+                        and 'Content-Type' headers for basic authentication.
+    """
     request_string = (
         settings.spotify_client_id.get_secret_value()
         + ":"
@@ -25,7 +32,31 @@ def get_auth_headers():
     return headers
 
 
+def get_bearer_auth_header(token: str) -> dict[str, str]:
+    """
+    Create a bearer authorization header using the given token.
+
+    Args:
+        token (str): Access token.
+
+    Returns:
+        dict[str, str]: A dictionary containing the 'Authorization' header
+                        for bearer authentication.
+    """
+    return {"Authorization": "Bearer " + token}
+
+
 def is_spotify_authenticated(session: SessionDep, user_id: str) -> bool:
+    """
+    Check if the user is authenticated.
+
+    Args:
+        session (SessionDep): Database session dependency.
+        user_id (str): User ID.
+
+    Returns:
+        bool: True if authenticated, False otherwise.
+    """
     tokens = get_user_tokens(session, user_id)
     # TODO: Check if tokens.access_token == access token from header???
     if tokens:
@@ -38,8 +69,16 @@ def is_spotify_authenticated(session: SessionDep, user_id: str) -> bool:
 
 def refresh_spotify_token(
     session: SessionDep, user_id: str, refresh_token: str
-):
-    headers = get_auth_headers()
+) -> None:
+    """
+    Refresh Spotify token and update the database.
+
+    Args:
+        session (SessionDep): Database session dependency.
+        user_id (str): User ID.
+        refresh_token (str): Refresh token.
+    """
+    headers = get_basic_auth_headers()
     form_data = {
         "grant_type": "refresh_token",
         "refresh_token": refresh_token,
