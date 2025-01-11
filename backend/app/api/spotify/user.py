@@ -1,9 +1,14 @@
-from datetime import datetime, timedelta
-
 import requests
 
 from app.api.dependencies import SessionDep
+from app.api.utils.token_utils import calculate_expiry_duration
 from app.models import SpotifyToken, SpotifyTokenData
+
+
+def get_user_id(access_token: str) -> str:
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.get("https://api.spotify.com/v1/me", headers=headers)
+    return response.json().get("id")
 
 
 def get_user_tokens(
@@ -16,28 +21,28 @@ def get_user_tokens(
 
 
 def update_or_create_user_tokens(
-    session: SessionDep, token_data: SpotifyTokenData
+    session: SessionDep, token_data: SpotifyTokenData, user_id: str
 ):
     access_token = token_data.access_token
     refresh_token = token_data.refresh_token
-    expires_in = datetime.utcnow() + timedelta(seconds=token_data.expires_in)
+    expires_in = calculate_expiry_duration(token_data.expires_in)
+    print(f"EXPIRES IN {expires_in}")
 
-    user_id = get_user_id(access_token)
     tokens = get_user_tokens(session, user_id)
     if tokens:
-        tokens.sqlmodel_update(token_data)
+        print(f"TOKENS BEFORE IF: {get_user_tokens(session, user_id)}")
+        tokens.expires_in = expires_in
+        tokens.sqlmodel_update(tokens)
+        print(f"TOKENS AFTER IF: {get_user_tokens(session, user_id)}")
     else:
+        print(f"TOKENS BEFORE ELSE: {tokens}")
         tokens = SpotifyToken(
             user_id=user_id,
             access_token=access_token,
             refresh_token=refresh_token,
             expires_in=expires_in,
         )
+        print(f"TOKENS AFTER ELSE: {tokens}")
+
     session.add(tokens)
     session.commit()
-
-
-def get_user_id(access_token: str) -> str:
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get("https://api.spotify.com/v1/me", headers=headers)
-    return response.json().get("id")

@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
 from app.api.dependencies import SessionDep
 from app.core.config import settings
@@ -8,14 +8,8 @@ router = APIRouter()
 
 
 @router.get("/")
-def read_root(session: SessionDep):
-    spotify_token = session.get(SpotifyToken, 1)
-    if spotify_token:
-        return spotify_token
-
-    return {
-        "Hello": "World",
-        "REDIRECT_URI": settings.redirect_uri,
-        "SPOTIFY_CLIENT_ID": settings.spotify_client_id,
-        "SPOTIFY_CLIENT_SECRET": settings.spotify_client_secret,
-    }
+def read_root(request: Request):
+    if request.state.is_authenticated:
+        return {"message": "Welcome back, authenticated user!"}
+    else:
+        return {"message": "Hello, please log in to access more features."}
