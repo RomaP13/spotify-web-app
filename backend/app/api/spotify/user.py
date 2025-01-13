@@ -41,11 +41,7 @@ def get_user_tokens(
 
 def update_or_create_user_tokens(
     session: SessionDep, token_data: SpotifyTokenData, user_id: str
-):
-    access_token = token_data.access_token
-    refresh_token = token_data.refresh_token
-    expires_in = calculate_expiry_duration(token_data.expires_in)
-    print(f"EXPIRES IN {expires_in}")
+) -> None:
     """
     Update or create user tokens in the database.
 
@@ -55,20 +51,16 @@ def update_or_create_user_tokens(
         user_id (str): Spotify user ID.
     """
     tokens = get_user_tokens(session, user_id)
+    token_data_dict = token_data.model_dump(exclude_unset=True)
+    token_data_dict["expires_in"] = calculate_expiry_duration(
+        token_data.expires_in
+    )
+
     if tokens:
-        print(f"TOKENS BEFORE IF: {get_user_tokens(session, user_id)}")
-        tokens.expires_in = expires_in
-        tokens.sqlmodel_update(tokens)
-        print(f"TOKENS AFTER IF: {get_user_tokens(session, user_id)}")
+        tokens.sqlmodel_update(token_data_dict)
     else:
-        print(f"TOKENS BEFORE ELSE: {tokens}")
-        tokens = SpotifyToken(
-            user_id=user_id,
-            access_token=access_token,
-            refresh_token=refresh_token,
-            expires_in=expires_in,
-        )
-        print(f"TOKENS AFTER ELSE: {tokens}")
+        tokens = SpotifyToken(user_id=user_id, **token_data_dict)
 
     session.add(tokens)
     session.commit()
+    session.refresh(tokens)
