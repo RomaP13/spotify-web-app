@@ -3,7 +3,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
 
 from app.api.dependencies import SessionDep
-from app.api.spotify.auth import get_auth_headers
+from app.api.spotify.auth_headers import get_basic_auth_headers
 from app.api.spotify.user import get_user_id, update_or_create_user_tokens
 from app.core.config import settings
 from app.models import SpotifyTokenData
@@ -20,7 +20,7 @@ def callback(request: Request, session: SessionDep):
     #       it originally provided from login function
 
     token_url = "https://accounts.spotify.com/api/token"
-    headers = get_auth_headers()
+    headers = get_basic_auth_headers()
     form_data = {
         "grant_type": "authorization_code",
         "code": code,

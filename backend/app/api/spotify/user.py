@@ -1,12 +1,13 @@
 import requests
 
 from app.api.dependencies import SessionDep
+from app.api.spotify.auth_headers import get_bearer_auth_header
 from app.api.utils.token_utils import calculate_expiry_duration
 from app.models import SpotifyToken, SpotifyTokenData
 
 
 def get_user_id(access_token: str) -> str:
-    headers = {"Authorization": f"Bearer {access_token}"}
+    headers = get_bearer_auth_header(access_token)
     response = requests.get("https://api.spotify.com/v1/me", headers=headers)
     return response.json().get("id")
 
