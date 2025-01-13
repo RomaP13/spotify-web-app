@@ -5,6 +5,15 @@ from app.models import SpotifyToken, SpotifyTokenData
 
 
 def get_user_id(access_token: str) -> str:
+    """
+    Get Spotify user ID using the access token.
+
+    Args:
+        access_token (str): Access token for Spotify API.
+
+    Returns:
+        str: User ID from Spotify API response.
+    """
     data = execute_spotify_api_request(
         access_token, endpoint="me", method="GET"
     )
@@ -14,6 +23,16 @@ def get_user_id(access_token: str) -> str:
 def get_user_tokens(
     session: SessionDep, spotify_user_id: str
 ) -> SpotifyToken | None:
+    """
+    Retrieve user tokens from the database.
+
+    Args:
+        session (SessionDep): Database session dependency.
+        spotify_user_id (str): Spotify user ID.
+
+    Returns:
+        SpotifyToken | None: User tokens or None if not found.
+    """
     user_tokens = session.get(SpotifyToken, spotify_user_id)
     if user_tokens:
         return user_tokens
@@ -27,7 +46,14 @@ def update_or_create_user_tokens(
     refresh_token = token_data.refresh_token
     expires_in = calculate_expiry_duration(token_data.expires_in)
     print(f"EXPIRES IN {expires_in}")
+    """
+    Update or create user tokens in the database.
 
+    Args:
+        session (SessionDep): Database session dependency.
+        token_data (SpotifyTokenData): Token data to store.
+        user_id (str): Spotify user ID.
+    """
     tokens = get_user_tokens(session, user_id)
     if tokens:
         print(f"TOKENS BEFORE IF: {get_user_tokens(session, user_id)}")
