@@ -1,8 +1,2 @@
-# Virtual environment
-venv
-
-# Python
-__pycache__
-
 # Environment
 .env
