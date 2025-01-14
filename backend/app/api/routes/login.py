@@ -11,7 +11,7 @@ router = APIRouter()
 @router.get("/login")
 def login() -> RedirectResponse:
     spotify_auth_url = "https://accounts.spotify.com/authorize"
-    scope = "user-library-read user-read-private user-read-email"
+    scope = "user-library-read user-read-private user-read-email user-top-read"
     params: dict[str, str] = {
         "client_id": settings.spotify_client_id.get_secret_value(),
         "response_type": "code",
