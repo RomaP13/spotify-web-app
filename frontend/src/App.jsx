@@ -1,33 +1,54 @@
-import { useState } from 'react';
-import './App.css';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
+import { useEffect, useState } from "react";
+import "./App.css";
+import api from "./api";
+
+function handleLoginClick() {
+  window.location.href = "http://localhost:8000/login";
+}
+
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await api.get("/user/data");
+        setUserData(response.data);
+        setLoggedIn(true);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setLoggedIn(false);
+      }
+    };
+    fetchUserData();
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {loggedIn ? (
+        <div>
+          <h1>Welcome, {userData.display_name}!</h1>
+          <p>Email: {userData.email}</p>
+          <p>Country: {userData.country}</p>
+          <p>Product: {userData.product}</p>
+          {userData.images && userData.images.length > 0 && (
+            <img
+              src={userData.images[0].url}
+              alt={`${userData.display_name}"s profile`}
+              width={userData.images[0].width}
+              height={userData.images[0].height}
+            />
+          )}
+        </div>
+      ) : (
+        <div>
+          <h1>Not logged in</h1>
+          <button onClick={handleLoginClick}>Login with Spotify</button>
+        </div>
+      )}
+      <button onClick={handleLoginClick}>Login with Spotify</button>
     </>
   );
 }
