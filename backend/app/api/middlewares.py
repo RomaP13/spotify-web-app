@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -7,21 +9,18 @@ from app.core.database import get_session
 
 class AuthenticationMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        spotify_user_id = request.session.get("spotify_user_id")
+        user_session_id_str = request.cookies.get("user_session_id")
 
-        if not spotify_user_id:
-            request.state.is_authenticated = False
-        else:
-            # Get token from headers
-            token = request.headers.get("Authorization")
-            print(f"TOKEN: {token}")
-            session = next(get_session())
-            # TODO: ADD COMMENTS
-            # Check if token from headers matches the one in the database
-            if not is_spotify_authenticated(session, spotify_user_id):
-                request.state.is_authenticated = False
-            else:
-                request.state.is_authenticated = True
+        if user_session_id_str:
+            try:
+                # Attempt to convert the string to a UUID
+                user_session_id = UUID(user_session_id_str)
+                session = next(get_session())
+                if is_spotify_authenticated(session, user_session_id):
+                    request.state.user_session_id = user_session_id
+            except ValueError:
+                # Handle the invalid UUID format
+                print("Invalid session_id format.")
 
         response = await call_next(request)
         return response

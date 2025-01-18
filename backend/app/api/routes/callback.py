@@ -4,7 +4,8 @@ from fastapi.responses import RedirectResponse
 
 from app.api.dependencies import SessionDep
 from app.api.spotify.auth_headers import get_basic_auth_headers
-from app.api.spotify.user import get_user_id, update_or_create_user_tokens
+from app.api.spotify.user import update_or_create_user_tokens
+from app.api.utils.session_utils import generate_secure_session_id
 from app.core.config import settings
 from app.models import SpotifyTokenData
 
@@ -29,9 +30,18 @@ def callback(request: Request, session: SessionDep):
 
     api_response = requests.post(token_url, data=form_data, headers=headers)
     if api_response.status_code == 200:
+        user_session_id = generate_secure_session_id()
+        user_session_id_str = str(user_session_id)
         token_data = SpotifyTokenData(**api_response.json())
-        user_id = get_user_id(token_data.access_token)
-        update_or_create_user_tokens(session, token_data, user_id)
-        request.session["spotify_user_id"] = user_id
+        update_or_create_user_tokens(session, token_data, user_session_id)
 
-    return RedirectResponse("/")
+        # Set HTTP-only cookie
+        response = RedirectResponse("http://localhost:5173/")
+        response.set_cookie(
+            key="user_session_id",
+            value=user_session_id_str,
+            httponly=True,
+            secure=False,
+            samesite="lax",
+        )
+        return response
