@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 
 import requests
 
@@ -9,7 +10,9 @@ from app.core.config import settings
 from app.models import SpotifyTokenData
 
 
-def is_spotify_authenticated(session: SessionDep, user_id: str) -> bool:
+def is_spotify_authenticated(
+    session: SessionDep, user_session_id: UUID
+) -> bool:
     """
     Check if the user is authenticated.
 
@@ -20,18 +23,19 @@ def is_spotify_authenticated(session: SessionDep, user_id: str) -> bool:
     Returns:
         bool: True if authenticated, False otherwise.
     """
-    tokens = get_user_tokens(session, user_id)
-    # TODO: Check if tokens.access_token == access token from header???
+    tokens = get_user_tokens(session, user_session_id)
     if tokens:
         expiry = tokens.expires_in
         if expiry <= datetime.utcnow():
-            refresh_spotify_token(session, user_id, tokens.refresh_token)
+            refresh_spotify_token(
+                session, user_session_id, tokens.refresh_token
+            )
         return True
     return False
 
 
 def refresh_spotify_token(
-    session: SessionDep, user_id: str, refresh_token: str
+    session: SessionDep, user_session_id: UUID, refresh_token: str
 ) -> None:
     """
     Refresh Spotify token and update the database.
@@ -61,5 +65,5 @@ def refresh_spotify_token(
             )
         print(f"JSON: {api_response.json()}")
         token_data = SpotifyTokenData(**json_response)
-        update_or_create_user_tokens(session, token_data, user_id)
+        update_or_create_user_tokens(session, token_data, user_session_id)
     # TODO: Redirect user to an error page???
