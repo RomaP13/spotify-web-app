@@ -15,10 +15,11 @@ router = APIRouter()
 @router.get("/callback")
 def callback(request: Request, session: SessionDep):
     code = request.query_params.get("code")
-    # state = request.query_params.get("state")
+    state = request.query_params.get("state")
+    session_state = request.session.get("state")
 
-    # TODO: Compare the state parameter with the state parameter
-    #       it originally provided from login function
+    if state != session_state:
+        return {"error": "State mismatch"}, 400
 
     token_url = "https://accounts.spotify.com/api/token"
     headers = get_basic_auth_headers()
