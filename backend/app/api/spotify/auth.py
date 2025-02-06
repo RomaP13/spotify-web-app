@@ -6,6 +6,7 @@ import requests
 from app.api.dependencies import SessionDep
 from app.api.spotify.auth_headers import get_basic_auth_headers
 from app.api.spotify.user import get_user_tokens, update_or_create_user_tokens
+from app.api.utils.token_utils import is_token_expired
 from app.core.config import settings
 from app.models import SpotifyTokenData
 
@@ -25,8 +26,7 @@ def is_spotify_authenticated(
     """
     tokens = get_user_tokens(session, user_session_id)
     if tokens:
-        expiry = tokens.expires_in
-        if expiry <= datetime.utcnow():
+        if is_token_expired(tokens.expires_at):
             refresh_spotify_token(
                 session, user_session_id, tokens.refresh_token
             )
