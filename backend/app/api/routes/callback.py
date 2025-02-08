@@ -36,13 +36,12 @@ def callback(request: Request, session: SessionDep):
         token_data = SpotifyTokenData(**api_response.json())
         update_or_create_user_tokens(session, token_data, user_session_id)
 
-        # Set HTTP-only cookie
         response = RedirectResponse("http://localhost:5173/")
         response.set_cookie(
             key="user_session_id",
             value=user_session_id_str,
             httponly=True,
-            secure=False,
+            secure=False,  # WARNING: Set to True in production
             samesite="lax",
         )
         return response
