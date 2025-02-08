@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Request, Response
 
-from app.api.dependencies import SessionDep, UserSessionDep
+from app.api.dependencies.session import SessionDep
 from app.api.spotify.request import execute_spotify_api_request
 from app.api.spotify.user import get_user_tokens
 

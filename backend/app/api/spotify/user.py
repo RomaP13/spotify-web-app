@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from app.api.dependencies import SessionDep
+from app.api.dependencies.session import SessionDep
 from app.api.spotify.request import execute_spotify_api_request
 from app.api.utils.token_utils import calculate_expiry_duration
 from app.models import SpotifyToken, SpotifyTokenData

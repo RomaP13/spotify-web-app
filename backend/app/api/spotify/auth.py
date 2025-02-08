@@ -3,7 +3,7 @@ from uuid import UUID
 
 import requests
 
-from app.api.dependencies import SessionDep
+from app.api.dependencies.session import SessionDep
 from app.api.spotify.auth_headers import get_basic_auth_headers
 from app.api.spotify.user import get_user_tokens, update_or_create_user_tokens
 from app.api.utils.token_utils import is_token_expired

@@ -2,7 +2,7 @@ import requests
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
 
-from app.api.dependencies import SessionDep
+from app.api.dependencies.session import SessionDep
 from app.api.spotify.auth_headers import get_basic_auth_headers
 from app.api.spotify.user import update_or_create_user_tokens
 from app.api.utils.session_utils import generate_secure_session_id
