@@ -14,9 +14,7 @@ def login(request: Request) -> RedirectResponse:
     spotify_auth_url = "https://accounts.spotify.com/authorize"
     scope = "user-library-read user-read-private user-read-email user-top-read"
 
-    # Generate a secure state token using the utility function
-    state = generate_state_token()
-    request.session["state"] = state
+    state = generate_state_token()  # Generate a secure state token
 
     params: dict[str, str] = {
         "client_id": settings.spotify_client_id.get_secret_value(),
@@ -28,4 +26,12 @@ def login(request: Request) -> RedirectResponse:
     }
 
     # Redirect to Spotify's authorization page
-    return RedirectResponse(f"{spotify_auth_url}?{urlencode(params)}")
+    response = RedirectResponse(f"{spotify_auth_url}?{urlencode(params)}")
+    response.set_cookie(
+        key="spotify_auth_state",
+        value=state,
+        httponly=True,
+        secure=False,  # WARNING: Set to True in production
+        samesite="lax",
+    )
+    return response

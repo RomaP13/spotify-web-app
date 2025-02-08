@@ -16,7 +16,7 @@ router = APIRouter()
 def callback(request: Request, session: SessionDep):
     code = request.query_params.get("code")
     state = request.query_params.get("state")
-    session_state = request.session.get("state")
+    session_state = request.cookies.get("spotify_auth_state")
 
     if state != session_state:
         return {"error": "State mismatch"}, 400
