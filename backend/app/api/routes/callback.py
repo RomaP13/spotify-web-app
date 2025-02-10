@@ -2,7 +2,7 @@ import requests
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
 
-from app.api.dependencies import SessionDep
+from app.api.dependencies.session import SessionDep
 from app.api.spotify.auth_headers import get_basic_auth_headers
 from app.api.spotify.user import update_or_create_user_tokens
 from app.api.utils.session_utils import generate_secure_session_id
@@ -15,10 +15,11 @@ router = APIRouter()
 @router.get("/callback")
 def callback(request: Request, session: SessionDep):
     code = request.query_params.get("code")
-    # state = request.query_params.get("state")
+    state = request.query_params.get("state")
+    session_state = request.cookies.get("spotify_auth_state")
 
-    # TODO: Compare the state parameter with the state parameter
-    #       it originally provided from login function
+    if state != session_state:
+        return {"error": "State mismatch"}, 400
 
     token_url = "https://accounts.spotify.com/api/token"
     headers = get_basic_auth_headers()
@@ -35,13 +36,12 @@ def callback(request: Request, session: SessionDep):
         token_data = SpotifyTokenData(**api_response.json())
         update_or_create_user_tokens(session, token_data, user_session_id)
 
-        # Set HTTP-only cookie
         response = RedirectResponse("http://localhost:5173/")
         response.set_cookie(
             key="user_session_id",
             value=user_session_id_str,
             httponly=True,
-            secure=False,
+            secure=False,  # WARNING: Set to True in production
             samesite="lax",
         )
         return response

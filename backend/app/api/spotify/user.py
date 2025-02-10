@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from app.api.dependencies import SessionDep
+from app.api.dependencies.session import SessionDep
 from app.api.spotify.request import execute_spotify_api_request
 from app.api.utils.token_utils import calculate_expiry_duration
 from app.models import SpotifyToken, SpotifyTokenData
@@ -54,9 +54,13 @@ def update_or_create_user_tokens(
     """
     tokens = get_user_tokens(session, user_session_id)
     token_data_dict = token_data.model_dump(exclude_unset=True)
-    token_data_dict["expires_in"] = calculate_expiry_duration(
+
+    # Calculate expiry timestamp
+    token_data_dict["expires_at"] = calculate_expiry_duration(
         token_data.expires_in
     )
+    # Remove expires_in since we're using expires_at
+    del token_data_dict["expires_in"]
 
     if tokens:
         tokens.sqlmodel_update(token_data_dict)

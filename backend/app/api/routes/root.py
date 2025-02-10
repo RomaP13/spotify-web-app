@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 
-from app.api.dependencies import SessionDep
+from app.api.dependencies.session import SessionDep
 from app.core.config import settings
 from app.models import SpotifyToken
 
