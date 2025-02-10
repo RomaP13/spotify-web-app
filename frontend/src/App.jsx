@@ -14,7 +14,7 @@ function App() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await api.get("/user/data");
+        const response = await api.get("/users/me");
         setUserData(response.data);
         setLoggedIn(true);
       } catch (error) {
