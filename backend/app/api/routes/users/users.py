@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter
 
 from app.api.dependencies.session import SessionDep
 from app.api.dependencies.user import CurrentUserDep
@@ -7,8 +7,8 @@ from app.api.spotify.request import execute_spotify_api_request
 router = APIRouter()
 
 
-@router.get("/user/data")
-def user_data(session: SessionDep, user: CurrentUserDep):
+@router.get("/me")
+def get_current_user_profile(session: SessionDep, user: CurrentUserDep):
     data = execute_spotify_api_request(
         user.access_token, endpoint="me", method="GET"
     )
