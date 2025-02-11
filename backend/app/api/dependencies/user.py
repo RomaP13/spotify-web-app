@@ -1,7 +1,7 @@
-import logging
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
+from loguru import logger
 
 from app.api.dependencies.session import SessionDep
 from app.api.dependencies.session_user import UserSessionDep
@@ -9,8 +9,6 @@ from app.api.spotify.auth import refresh_spotify_token
 from app.api.spotify.user import get_user_tokens
 from app.api.utils.token_utils import is_token_expired
 from app.models import SpotifyToken
-
-logger = logging.getLogger(__name__)
 
 
 def get_current_user(
