@@ -2,10 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
+from app.api.middlewares import LoggingMiddleware
 from app.core.database import create_db_and_tables
 
 
 app = FastAPI()
+
+app.add_middleware(LoggingMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
