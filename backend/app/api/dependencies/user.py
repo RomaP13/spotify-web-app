@@ -14,7 +14,16 @@ from app.models import SpotifyToken
 def get_current_user(
     session: SessionDep, user_session_id: UserSessionDep
 ) -> SpotifyToken:
-    user_token = get_user_tokens(session, user_session_id)
+    """Get the current user from the database.
+
+    Args:
+        session (SessionDep): Database session dependency.
+        user_session_id (UserSessionDep): User session ID dependency.
+
+    Returns:
+        SpotifyToken: The current user.
+    """
+    user_token: SpotifyToken | None = get_user_tokens(session, user_session_id)
 
     if not user_token:
         raise HTTPException(
@@ -28,7 +37,9 @@ def get_current_user(
         refresh_spotify_token(
             session, user_session_id, user_token.refresh_token
         )
-        user_token = get_user_tokens(session, user_session_id)
+        user_token: SpotifyToken | None = get_user_tokens(
+            session, user_session_id
+        )
         if not user_token:  # Ensure a token is still returned after refresh
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
