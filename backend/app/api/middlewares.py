@@ -1,3 +1,5 @@
+"""Logging Middleware for FastAPI."""
+
 import time
 
 from fastapi import Request, Response
@@ -12,13 +14,17 @@ from app.api.utils.logging_utils import LogMessageEmojis
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
+    """Middleware for logging requests and responses."""
+
     def __init__(self, app: ASGIApp) -> None:
+        """Initializes the LoggingMiddleware instance."""
         super().__init__(app)
         self._emojis = LogMessageEmojis()
 
     async def dispatch(
         self, request: Request, call_next: RequestResponseEndpoint
     ) -> Response:
+        """Logs the request and response for a given FastAPI request."""
         start_time = time.time()
 
         # Read request body
