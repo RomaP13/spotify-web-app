@@ -19,7 +19,7 @@ def is_spotify_authenticated(
 
     Args:
         session (SessionDep): Database session dependency.
-        user_id (str): User ID.
+        user_session_id (UUID): User session ID.
 
     Returns:
         bool: True if authenticated, False otherwise.
@@ -44,7 +44,7 @@ def refresh_spotify_token(
 
     Args:
         session (SessionDep): Database session dependency.
-        user_id (str): User ID.
+        user_session_id (UUID): User session ID.
         refresh_token (str): Refresh token.
     """
     headers: dict[str, str] = get_basic_auth_headers()
