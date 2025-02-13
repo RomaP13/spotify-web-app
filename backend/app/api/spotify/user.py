@@ -31,7 +31,7 @@ def get_user_tokens(
 
     Args:
         session (SessionDep): Database session dependency.
-        spotify_user_id (str): Spotify user ID.
+        user_session_id (UUID): User session ID.
 
     Returns:
         SpotifyToken | None: User tokens or None if not found.
