@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 
 from app.api.dependencies.session import SessionDep
@@ -35,14 +36,18 @@ def get_user_tokens(
     Returns:
         SpotifyToken | None: User tokens or None if not found.
     """
-    user_tokens = session.get(SpotifyToken, user_session_id)
+    user_tokens: SpotifyToken | None = session.get(
+        SpotifyToken, user_session_id
+    )
     if user_tokens:
         return user_tokens
     return None
 
 
 def update_or_create_user_tokens(
-    session: SessionDep, token_data: SpotifyTokenData, user_session_id: UUID
+    session: SessionDep,
+    token_data: SpotifyTokenData,
+    user_session_id: UUID,
 ) -> None:
     """
     Update or create user tokens in the database.
@@ -50,14 +55,14 @@ def update_or_create_user_tokens(
     Args:
         session (SessionDep): Database session dependency.
         token_data (SpotifyTokenData): Token data to store.
-        user_id (str): Spotify user ID.
+        user_session_id (UUID): User session ID.
     """
-    tokens = get_user_tokens(session, user_session_id)
-    token_data_dict = token_data.model_dump(exclude_unset=True)
+    tokens: SpotifyToken | None = get_user_tokens(session, user_session_id)
+    token_data_dict: dict[str, Any] = token_data.model_dump(exclude_unset=True)
 
     # Calculate expiry timestamp
     token_data_dict["expires_at"] = calculate_expiry_duration(
-        token_data.expires_in
+        seconds=token_data.expires_in
     )
     # Remove expires_in since we're using expires_at
     del token_data_dict["expires_in"]
