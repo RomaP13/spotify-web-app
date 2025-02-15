@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 def is_token_expired(expires_at: datetime) -> bool:
@@ -10,7 +10,7 @@ def is_token_expired(expires_at: datetime) -> bool:
     Returns:
         bool: True if the token has expired, False otherwise.
     """
-    return datetime.utcnow() >= expires_at
+    return datetime.now(timezone.utc) >= expires_at
 
 
 def calculate_expiry_duration(seconds: int) -> datetime:
@@ -22,4 +22,4 @@ def calculate_expiry_duration(seconds: int) -> datetime:
     Returns:
         datetime: The expiration date.
     """
-    return datetime.utcnow() + timedelta(seconds=seconds)
+    return datetime.now(timezone.utc) + timedelta(seconds=seconds)

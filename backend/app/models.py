@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
@@ -9,7 +9,9 @@ class SpotifyToken(SQLModel, table=True):
     user_session_id: uuid.UUID | None = Field(
         default=None, primary_key=True, index=True
     )
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
     access_token: str = Field(max_length=300)
     refresh_token: str = Field(max_length=300)
     expires_at: datetime = Field()
