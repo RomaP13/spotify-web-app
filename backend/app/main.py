@@ -1,3 +1,6 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
@@ -11,7 +14,16 @@ logger.add(
     "logs/debug.log", rotation="10 MB", retention="40 days", level="INFO"
 )
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    """Lifespan hook for the FastAPI application."""
+    create_db_and_tables()
+    logger.info("🚀 FastAPI server is starting...")
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(LoggingMiddleware)
 
@@ -24,9 +36,3 @@ app.add_middleware(
 )
 
 app.include_router(api_router)
-
-
-@app.on_event("startup")
-def on_startup():
-    create_db_and_tables()
-    logger.info("🚀 FastAPI server is starting...")
