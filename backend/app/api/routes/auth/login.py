@@ -1,6 +1,6 @@
 from urllib.parse import urlencode
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 from fastapi.responses import RedirectResponse
 
 from app.api.utils.session_utils import generate_state_token
@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.get("/login")
-def login(request: Request) -> RedirectResponse:
+def login() -> RedirectResponse:
     spotify_auth_url = "https://accounts.spotify.com/authorize"
     scope = "user-library-read user-read-private user-read-email user-top-read"
 
