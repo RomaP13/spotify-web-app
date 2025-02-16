@@ -8,8 +8,7 @@ from app.models import SpotifyToken, SpotifyTokenData
 
 
 def get_user_id(access_token: str) -> str:
-    """
-    Get Spotify user ID using the access token.
+    """Get Spotify user ID using the access token.
 
     Args:
         access_token (str): Access token for Spotify API.
@@ -26,8 +25,7 @@ def get_user_id(access_token: str) -> str:
 def get_user_tokens(
     session: SessionDep, user_session_id: UUID
 ) -> SpotifyToken | None:
-    """
-    Retrieve user tokens from the database.
+    """Retrieve user tokens from the database.
 
     Args:
         session (SessionDep): Database session dependency.
@@ -49,8 +47,7 @@ def update_or_create_user_tokens(
     token_data: SpotifyTokenData,
     user_session_id: UUID,
 ) -> None:
-    """
-    Update or create user tokens in the database.
+    """Update or create user tokens in the database.
 
     Args:
         session (SessionDep): Database session dependency.
