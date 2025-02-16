@@ -14,8 +14,7 @@ from app.models import SpotifyToken, SpotifyTokenData
 def is_spotify_authenticated(
     session: SessionDep, user_session_id: UUID
 ) -> bool:
-    """
-    Check if the user is authenticated.
+    """Check if the user is authenticated.
 
     Args:
         session (SessionDep): Database session dependency.
@@ -39,8 +38,7 @@ def is_spotify_authenticated(
 def refresh_spotify_token(
     session: SessionDep, user_session_id: UUID, refresh_token: str
 ) -> None:
-    """
-    Refresh Spotify token and update the database.
+    """Refresh Spotify token and update the database.
 
     Args:
         session (SessionDep): Database session dependency.

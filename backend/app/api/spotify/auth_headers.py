@@ -4,8 +4,7 @@ from app.core.config import settings
 
 
 def get_basic_auth_headers() -> dict[str, str]:
-    """
-    Create basic authentication headers using Spotify client credentials.
+    """Create basic authentication headers using Spotify client credentials.
 
     Returns:
         dict[str, str]: A dictionary containing the 'Authorization'
@@ -27,8 +26,7 @@ def get_basic_auth_headers() -> dict[str, str]:
 
 
 def get_bearer_auth_header(token: str) -> dict[str, str]:
-    """
-    Create a bearer authorization header using the given token.
+    """Create a bearer authorization header using the given token.
 
     Args:
         token (str): Access token.
