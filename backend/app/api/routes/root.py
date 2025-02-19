@@ -1,9 +1,5 @@
 from fastapi import APIRouter, Request
 
-from app.api.dependencies.session import SessionDep
-from app.core.config import settings
-from app.models import SpotifyToken
-
 router = APIRouter()
 
 

@@ -3,6 +3,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    """Pydantic settings class for the application."""
+
     spotify_client_id: SecretStr
     spotify_client_secret: SecretStr
     redirect_uri: str
