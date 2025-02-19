@@ -1,23 +1,38 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
-from starlette.middleware.sessions import SessionMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+from loguru import logger
 
 from app.api.main import api_router
-from app.api.middlewares import AuthenticationMiddleware
+from app.api.middlewares import LoggingMiddleware
 from app.core.database import create_db_and_tables
 
-app = FastAPI()
-
-app.add_middleware(AuthenticationMiddleware)
-
-app.add_middleware(
-    SessionMiddleware,
-    secret_key="your-random-secret-key",
+# Configure logging
+logger.add(
+    "logs/debug.log", rotation="10 MB", retention="40 days", level="INFO"
 )
 
 
-app.include_router(api_router)
-
-
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    """Lifespan hook for the FastAPI application."""
     create_db_and_tables()
+    logger.info("🚀 FastAPI server is starting...")
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(LoggingMiddleware)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(api_router)
